@@ -1,0 +1,17 @@
+# Fly.io 배포 설정. app 이름은 전 세계에서 하나뿐이어야 하므로 바꿔서 쓴다 (fly launch가 물어본다).
+app = "sh-notice-hyo213"
+primary_region = "nrt"   # 도쿄 (서울 리전이 없으면 가장 가까운 곳)
+
+[build]
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "stop"    # 안 쓸 때는 꺼서 비용을 아낀다 (첫 요청 때 몇 초 걸려 깨어남)
+  auto_start_machines = true
+  min_machines_running = 0
+
+[[vm]]
+  memory = "512mb"
+  cpu_kind = "shared"
+  cpus = 1
