@@ -24,25 +24,26 @@ python3 -c "import secrets; print(secrets.token_urlsafe(32))"
 이 값이 서버의 비밀번호입니다. 모든 요청에 `Authorization: Bearer <토큰>` 헤더가 있어야 하고, 없으면 401로 막습니다.
 토큰을 저장소에 커밋하지 마세요.
 
-## 2. Fly.io에 배포 (예시)
+## 2. Render에 배포 (무료, 카드 없음)
 
-[Fly.io](https://fly.io) 계정과 `flyctl`이 필요합니다. 작게 쓰면 무료 범위이거나 월 몇 달러 수준입니다. 요금은 Fly.io에서 확인하세요.
+[Render](https://render.com)의 무료 웹 서비스를 씁니다. 저장소에 있는 `render.yaml`(Blueprint)에 설정이 다 들어 있습니다.
 
-```bash
-cd sh-notice-mcp
-fly launch --no-deploy            # fly.toml의 app 이름을 정함
-fly secrets set SH_REMOTE_TOKEN=<1에서 만든 토큰>
-fly deploy
-```
+1. 이 저장소를 GitHub에 올립니다 (비공개 저장소도 됩니다).
+2. Render에 GitHub 계정으로 가입·로그인합니다.
+3. **New + → Blueprint** → 이 저장소 선택. 목록에 없으면 Render GitHub 앱에 이 저장소 접근을 허용합니다.
+4. `SH_REMOTE_TOKEN` 입력 칸에 1에서 만든 토큰을 넣고 **Apply**.
+5. 배포가 끝나면 주소는 `https://<서비스 이름>.onrender.com/mcp` 입니다.
 
-배포가 끝나면 주소는 `https://<app 이름>.fly.dev/mcp` 입니다.
-다른 곳(Render, Railway, 자기 서버 등)도 Dockerfile 그대로 쓸 수 있습니다. 포트는 `PORT` 환경변수(기본 8080)를 따릅니다.
+무료 서비스는 15분 동안 요청이 없으면 잠들고, 다음 요청 때 깨어나는 데 1분쯤 걸립니다. 오랜만에 쓰면 첫 응답이 느리거나 한 번 실패할 수 있으니 다시 물어보세요.
+
+다른 곳(Fly.io, Railway, 자기 서버 등)도 Dockerfile 그대로 쓸 수 있습니다. Fly.io용 `fly.toml`도 들어 있지만, Fly.io는 결제 수단 등록이 필요합니다.
+포트는 `PORT` 환경변수(기본 8080)를 따릅니다.
 Claude는 표준 포트(443)의 HTTPS 주소에만 연결하므로, `:8443` 같은 포트가 붙은 주소는 쓸 수 없습니다.
 
 ## 3. claude.ai에 커넥터 추가
 
 1. claude.ai(웹이나 데스크톱 앱) → 설정 → 커넥터 → **사용자 지정 커넥터 추가**
-2. URL: `https://<app 이름>.fly.dev/mcp`
+2. URL: `https://<서비스 이름>.onrender.com/mcp`
 3. 인증은 'No sign in'(OAuth 없음)으로 두고, **Request headers**에 `Authorization` = `Bearer <토큰>` 을 넣습니다.
 4. 저장하면 휴대폰 Claude 앱에도 같은 커넥터가 보입니다. 대화창의 "+" → 커넥터에서 켭니다.
 
@@ -55,5 +56,5 @@ Claude는 표준 포트(443)의 HTTPS 주소에만 연결하므로, `:8443` 같�
 ## 보안 메모
 
 - 서버는 SH 공개 게시판만 읽습니다. 쓰기·삭제 도구가 없습니다.
-- 토큰이 새면 `fly secrets set SH_REMOTE_TOKEN=<새 토큰>`으로 바꾸고 커넥터 헤더도 바꾸세요.
+- 토큰이 새면 Render 대시보드 → 서비스 → Environment에서 `SH_REMOTE_TOKEN`을 새 값으로 바꾸고, 커넥터 헤더도 바꾸세요.
 - SH 사이트에 부담을 주지 않도록 요청 간격 1초를 지키고 게시판 1페이지만 읽습니다.

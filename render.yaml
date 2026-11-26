@@ -1,0 +1,16 @@
+# Render Blueprint: 원격 MCP 서버(sh-notice-remote)를 무료 웹 서비스로 띄운다. 카드 필요 없음.
+# Render 대시보드 → New + → Blueprint → 이 저장소 선택 → SH_REMOTE_TOKEN 값만 입력 → Apply.
+# 무료 서비스는 15분 동안 요청이 없으면 잠들고, 다음 요청 때 깨어나는 데 1분 정도 걸린다.
+services:
+  - type: web
+    name: sh-notice-hyo213        # 주소가 https://<name>.onrender.com 이 된다 (이미 쓰이면 뒤에 글자가 붙음)
+    runtime: docker
+    plan: free
+    region: singapore             # 한국에서 가장 가까운 지역
+    dockerfilePath: ./Dockerfile
+    autoDeploy: true              # main 브랜치에 push하면 다시 배포
+    envVars:
+      - key: SH_REMOTE_TOKEN      # 직접 만든 24자 이상 토큰. Blueprint 적용 때 Render가 입력 칸을 띄운다
+        sync: false
+      - key: SH_NOTICE_DATA_DIR
+        value: /tmp/sh-notice
